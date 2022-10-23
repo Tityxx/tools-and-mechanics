@@ -1,26 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
-using ToolsAndMechanics.UserInterfaceManager;
 using UnityEngine;
 using Zenject;
 
-public class WindowsControllerInstaller : MonoInstaller
+namespace ToolsAndMechanics.UserInterfaceManager
 {
-    [SerializeField]
-    private bool needInstantiate = true;
-    [SerializeField]
-    private WindowsController controller;
-
-    public override void InstallBindings()
+    public class WindowsControllerInstaller : MonoInstaller
     {
-        if (needInstantiate)
+        [SerializeField]
+        private bool needInstantiate = true;
+        [SerializeField]
+        private WindowsController controller;
+
+        public override void InstallBindings()
         {
-            WindowsController c = Container.InstantiatePrefabForComponent<WindowsController>(controller);
-            Container.Bind<WindowsController>().FromInstance(c).AsSingle().NonLazy();
-        }
-        else
-        {
-            Container.Bind<WindowsController>().FromInstance(controller).AsSingle().NonLazy();
+            if (needInstantiate)
+            {
+                WindowsController c = Container.InstantiatePrefabForComponent<WindowsController>(controller);
+                Container.Bind<WindowsController>().FromInstance(c).AsSingle().NonLazy();
+            }
+            else
+            {
+                Container.Bind<WindowsController>().FromInstance(controller).AsSingle().NonLazy();
+            }
         }
     }
 }
