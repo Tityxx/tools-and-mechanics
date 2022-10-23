@@ -8,11 +8,20 @@ using Zenject;
 public class ObjectPoolInstaller : MonoInstaller
 {
     [SerializeField]
+    private bool needInstantiate = true;
+    [SerializeField]
     private ObjectPoolController controller;
 
     public override void InstallBindings()
     {
-        ObjectPoolController p = Container.InstantiatePrefabForComponent<ObjectPoolController>(controller);
-        Container.Bind<ObjectPoolController>().FromInstance(p).AsSingle().NonLazy();
+        if (needInstantiate)
+        {
+            ObjectPoolController p = Container.InstantiatePrefabForComponent<ObjectPoolController>(controller);
+            Container.Bind<ObjectPoolController>().FromInstance(p).AsSingle().NonLazy();
+        }
+        else
+        {
+            Container.Bind<ObjectPoolController>().FromInstance(controller).AsSingle().NonLazy();
+        }
     }
 }
