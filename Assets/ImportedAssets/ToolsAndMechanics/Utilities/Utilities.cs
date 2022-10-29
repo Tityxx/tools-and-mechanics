@@ -71,5 +71,28 @@ namespace ToolsAndMechanics.Utilities
             float sqrDistance = Vector2.SqrMagnitude(p1 - p2);
             return sqrDistance <= maxRadius * maxRadius && sqrDistance >= minRadius * minRadius;
         }
+
+        public static bool IsPointInTriangle(Vector3 pos, Vector3 a, Vector3 b, Vector3 c)
+        {
+            // Compute vectors        
+            Vector3 v0 = c - a;
+            Vector3 v1 = b - a;
+            Vector3 v2 = pos - a;
+
+            // Compute dot products
+            float dot00 = Vector3.Dot(v0, v0);
+            float dot01 = Vector3.Dot(v0, v1);
+            float dot02 = Vector3.Dot(v0, v2);
+            float dot11 = Vector3.Dot(v1, v1);
+            float dot12 = Vector3.Dot(v1, v2);
+
+            // Compute barycentric coordinates
+            float invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+            float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+            float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+            // Check if point is in triangle
+            return (u >= 0) && (v >= 0) && (u + v < 1);
+        }
     }
 }
