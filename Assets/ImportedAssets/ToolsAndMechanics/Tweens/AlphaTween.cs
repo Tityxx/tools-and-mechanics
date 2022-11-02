@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using TMPro;
 
 namespace ToolsAndMechanics.Tweens
 {
@@ -16,12 +17,14 @@ namespace ToolsAndMechanics.Tweens
 
         private Image image;
         private SpriteRenderer sprite;
+        private TMP_Text text;
 
         protected override void Awake()
         {
             base.Awake();
             image = Target.GetComponent<Image>();
             sprite = Target.GetComponent<SpriteRenderer>();
+            text = Target.GetComponent<TMP_Text>();
         }
 
         public override void Execute(bool straight = true)
@@ -45,6 +48,15 @@ namespace ToolsAndMechanics.Tweens
             else if (sprite)
             {
                 sprite.DOColor(GetColor(straight ? endAlpha : startAlpha), duration).
+                    SetEase(easeType).
+                    SetLoops(loopCount, loopType).
+                    SetUpdate(ignoreTimeScale).
+                    SetDelay(delay).
+                    OnComplete(() => OnCompleted());
+            }
+            else if (text)
+            {
+                text.DOColor(GetColor(straight ? endAlpha : startAlpha), duration).
                     SetEase(easeType).
                     SetLoops(loopCount, loopType).
                     SetUpdate(ignoreTimeScale).
@@ -79,6 +91,12 @@ namespace ToolsAndMechanics.Tweens
                 c.a = value;
                 sprite.color = c;
             }
+            else if (text)
+            {
+                Color c = text.color;
+                c.a = value;
+                text.color = c;
+            }
         }
 
         private Color GetColor(float alpha)
@@ -92,6 +110,10 @@ namespace ToolsAndMechanics.Tweens
             else if (sprite)
             {
                 color = sprite.color;
+            }
+            else if (text)
+            {
+                color = text.color;
             }
             color.a = alpha;
             return color;

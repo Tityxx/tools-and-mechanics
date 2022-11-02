@@ -91,7 +91,7 @@ namespace ToolsAndMechanics.ObjectPool
         public void ReturnObject(GameObject go, PoolableObjectData data)
         {
             go.SetActive(false);
-            go.transform.parent = null;
+            go.transform.SetParent(null);
             if (queue.ContainsKey(data))
             {
                 queue[data].Enqueue(go);

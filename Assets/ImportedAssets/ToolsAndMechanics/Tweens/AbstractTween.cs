@@ -60,6 +60,11 @@ namespace ToolsAndMechanics.Tweens
             }
         }
 
+        protected virtual void OnDestroy()
+        {
+            Kill();
+        }
+
         public virtual void Execute(bool straight = true)
         {
             Stop();
