@@ -16,13 +16,14 @@ namespace ToolsAndMechanics.UserInterfaceManager
         {
             if (needInstantiate)
             {
-                WindowsController c = Container.InstantiatePrefabForComponent<WindowsController>(controller);
-                Container.Bind<WindowsController>().FromInstance(c).AsSingle().NonLazy();
+                controller = Container.InstantiatePrefabForComponent<WindowsController>(controller);
+                Container.Bind<WindowsController>().FromInstance(controller).AsSingle().NonLazy();
             }
             else
             {
                 Container.Bind<WindowsController>().FromInstance(controller).AsSingle().NonLazy();
             }
+            controller.Init();
         }
     }
 }

@@ -12,6 +12,8 @@ namespace ToolsAndMechanics.ObjectPool
     public class ObjectPoolController : MonoBehaviour
     {
         [SerializeField]
+        private bool initOnAwake;
+        [SerializeField]
         private PoolableObjectData[] dataList;
 
         [Inject]
@@ -21,7 +23,19 @@ namespace ToolsAndMechanics.ObjectPool
 
         private void Awake()
         {
-            InitPool();
+            if (initOnAwake) Init();
+        }
+
+        public void Init()
+        {
+            foreach (PoolableObjectData data in dataList)
+            {
+                for (int i = 0; i < data.InitCount; i++)
+                {
+                    GameObject go = CreateObject(data);
+                    go.SetActive(false);
+                }
+            }
         }
 
         /// <summary>
@@ -29,26 +43,7 @@ namespace ToolsAndMechanics.ObjectPool
         /// </summary>
         public GameObject GetObject(PoolableObjectData data, bool active = true, Transform parent = null)
         {
-            GameObject go;
-
-            if (queue.ContainsKey(data))
-            {
-                if (queue[data].Count > 0)
-                {
-                    go = queue[data].Dequeue();
-                }
-                else
-                {
-                    go = container.InstantiatePrefab(data.Prefab);
-                    TryAddInfoInInterface(data, go);
-                }
-            }
-            else
-            {
-                queue.Add(data, new Queue<GameObject>());
-                go = container.InstantiatePrefab(data.Prefab);
-                TryAddInfoInInterface(data, go);
-            }
+            GameObject go = CreateObject(data);           
 
             go.transform.SetParent(parent);
             go.SetActive(active);
@@ -88,41 +83,53 @@ namespace ToolsAndMechanics.ObjectPool
         /// <summary>
         /// Вернуть объект в пул
         /// </summary>
-        public void ReturnObject(GameObject go, PoolableObjectData data)
+        public void ReturnObject(GameObject go)
         {
             go.SetActive(false);
             go.transform.SetParent(null);
-            if (queue.ContainsKey(data))
-            {
-                queue[data].Enqueue(go);
-            }
-            else
-            {
-                queue.Add(data, new Queue<GameObject>(new[] { go }));
-            }
-        }
 
-        private void InitPool()
-        {
-            foreach (PoolableObjectData data in dataList)
+            if (go.TryGetComponent(out PoolableObjectInfo info))
             {
-                queue.Add(data, new Queue<GameObject>());
-                for (int i = 0; i < data.InitCount; i++)
+                if (queue.ContainsKey(info.Data))
                 {
-                    GameObject go = container.InstantiatePrefab(data.Prefab);
-                    TryAddInfoInInterface(data, go);
-                    go.SetActive(false);
-                    queue[data].Enqueue(go);
+                    queue[info.Data].Enqueue(go);
+                }
+                else
+                {
+                    queue.Add(info.Data, new Queue<GameObject>(new[] { go }));
                 }
             }
         }
 
-        private void TryAddInfoInInterface(PoolableObjectData data, GameObject go)
+        private GameObject CreateObject(PoolableObjectData data)
         {
-            if (go.TryGetComponent(out IPoolableObject obj))
+            GameObject go;
+
+            if (queue.ContainsKey(data))
             {
-                obj.InitPoolableObject(this, data);
+                if (queue[data].Count > 0)
+                {
+                    go = queue[data].Dequeue();
+                }
+                else
+                {
+                    go = container.InstantiatePrefab(data.Prefab);
+                    AddInfoComponent(data, go);
+                }
             }
+            else
+            {
+                queue.Add(data, new Queue<GameObject>());
+                go = container.InstantiatePrefab(data.Prefab);
+                AddInfoComponent(data, go);
+            }
+
+            return go;
+        }
+
+        private void AddInfoComponent(PoolableObjectData data, GameObject go)
+        {
+            go.AddComponent<PoolableObjectInfo>().Data = data;
         }
     }
 }

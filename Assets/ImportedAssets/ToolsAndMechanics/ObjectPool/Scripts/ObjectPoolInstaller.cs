@@ -17,13 +17,14 @@ namespace ToolsAndMechanics.ObjectPool
         {
             if (needInstantiate)
             {
-                ObjectPoolController p = Container.InstantiatePrefabForComponent<ObjectPoolController>(controller);
-                Container.Bind<ObjectPoolController>().FromInstance(p).AsSingle().NonLazy();
+                controller = Container.InstantiatePrefabForComponent<ObjectPoolController>(controller);
+                Container.Bind<ObjectPoolController>().FromInstance(controller).AsSingle().NonLazy();
             }
             else
             {
                 Container.Bind<ObjectPoolController>().FromInstance(controller).AsSingle().NonLazy();
             }
+            controller.Init();
         }
     }
 }

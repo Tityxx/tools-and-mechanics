@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace ToolsAndMechanics.ObjectPool
 {
-    public interface IPoolableObject
+    public class PoolableObjectInfo : MonoBehaviour
     {
-        public void InitPoolableObject(ObjectPoolController pool, PoolableObjectData data);
+        public PoolableObjectData Data;
     }
 }

@@ -15,6 +15,7 @@ namespace ToolsAndMechanics.UserInterfaceManager
         [SerializeField]
         private bool closeCurrentWindow;
 
+        [Inject]
         private WindowsController controller;
 
         protected override void OnEnable()
@@ -28,11 +29,6 @@ namespace ToolsAndMechanics.UserInterfaceManager
             if (closeCurrentWindow)
                 btn.interactable = false;
             controller.SetWindow(window, closeCurrentWindow);
-        }
-
-        public void SetController(WindowsController controller)
-        {
-            this.controller = controller;
         }
     }
 }

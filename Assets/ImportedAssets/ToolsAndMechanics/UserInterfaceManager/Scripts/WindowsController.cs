@@ -13,6 +13,8 @@ namespace ToolsAndMechanics.UserInterfaceManager
         [SerializeField]
         private Canvas canvas;
         [SerializeField]
+        private bool initOnAwake;
+        [SerializeField]
         [Header("Создавать все окна сразу или по мере вызова")]
         private bool createAllWindows;
 
@@ -31,6 +33,14 @@ namespace ToolsAndMechanics.UserInterfaceManager
         private bool needClose;
 
         private void Awake()
+        {
+            if (initOnAwake)
+            {
+                Init();
+            }
+        }
+
+        public void Init()
         {
             string canvasName = canvas.name;
             canvas = Instantiate(canvas, transform);
@@ -59,11 +69,6 @@ namespace ToolsAndMechanics.UserInterfaceManager
             window.gameObject.name = data.Id;
             window.gameObject.SetActive(false);
             windowsDic.Add(data.Id, window);
-
-            foreach (var b in window.GetComponentsInChildren<OpenWindowButton>())
-            {
-                b.SetController(this);
-            }
         }
 
         /// <summary>
