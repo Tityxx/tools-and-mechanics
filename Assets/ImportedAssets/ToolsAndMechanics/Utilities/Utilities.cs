@@ -32,6 +32,36 @@ namespace ToolsAndMechanics.Utilities
             }
         }
 
+        public static void SetSortPositions(this List<Transform> list, int sqrtCellsCount, float size)
+        {
+            Transform[,] array = new Transform[sqrtCellsCount, sqrtCellsCount];
+
+            for (int y = 0; y < sqrtCellsCount; y++)
+            {
+                for (int x = 0; x < sqrtCellsCount; x++)
+                {
+                    array[y, x] = list[y * sqrtCellsCount + x];
+                }
+            }
+            array.SetSortPositions(sqrtCellsCount, size);
+        }
+
+        public static void SetSortPositions(this Transform[,] array, int sqrtCellsCount, float size)
+        {
+            for (int y = 0; y < sqrtCellsCount; y++)
+            {
+                for (int x = 0; x < sqrtCellsCount; x++)
+                {
+                    /*Vector2 offset = new Vector2(x - (cellsCount) / 2, y - (float)cellsCount / 2) * size;
+                    array[y, x].position = center + new Vector3(offset.x, array[y, x].position.y, offset.y);*/
+
+                    Vector2 offset = new Vector2(x, y) * size;
+                    array[y, x].position = new Vector3(array[0, 0].position.x + offset.x, array[y, x].position.y, array[0, 0].position.z + offset.y);
+                }
+            }
+        }
+
+
         public static float GetDistance2D(Transform t1, Transform t2)
         {
             return GetDistance2D(t1.position, t2.position);

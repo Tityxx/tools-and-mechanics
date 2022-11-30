@@ -35,6 +35,17 @@ namespace ToolsAndMechanics.Tweens
             pathPosReverse.Reverse();
         }
 
+        public void SetValue(List<Vector3> val, bool isStart)
+        {
+            pathPos.Clear();
+            pathPos.AddRange(val);
+            pathPosReverse.Clear();
+            pathPosReverse.AddRange(val);
+
+            if (isStart) pathPosReverse.Reverse();
+            else pathPos.Reverse();
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)

@@ -13,6 +13,12 @@ namespace ToolsAndMechanics.Tweens
 
         private RectTransform rect => Target as RectTransform;
 
+        public void SetValue(Vector2 val, bool isStart)
+        {
+            if (isStart) startPosition = val;
+            else endPosition = val;
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)

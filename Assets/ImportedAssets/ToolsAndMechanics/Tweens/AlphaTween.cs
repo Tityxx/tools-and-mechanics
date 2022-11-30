@@ -27,6 +27,12 @@ namespace ToolsAndMechanics.Tweens
             text = Target.GetComponent<TMP_Text>();
         }
 
+        public void SetValue(float val, bool isStart)
+        {
+            if (isStart) startAlpha = val;
+            else endAlpha = val;
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)

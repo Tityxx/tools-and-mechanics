@@ -13,6 +13,12 @@ namespace ToolsAndMechanics.Tweens
         [SerializeField]
         private Vector3 endScale;
 
+        public void SetValue(Vector3 val, bool isStart)
+        {
+            if (isStart) startScale = val;
+            else endScale = val;
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)

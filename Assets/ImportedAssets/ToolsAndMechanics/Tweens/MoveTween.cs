@@ -16,6 +16,12 @@ namespace ToolsAndMechanics.Tweens
         [SerializeField]
         private Vector3 endPosition;
 
+        public void SetValue(Vector3 val, bool isStart)
+        {
+            if (isStart) startPosition = val;
+            else endPosition = val;
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)

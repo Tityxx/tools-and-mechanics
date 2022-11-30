@@ -22,6 +22,12 @@ namespace ToolsAndMechanics.Tweens
         private Tween rotationTween;
         private Tween scaleTween;
 
+        public void SetValue(Transform val, bool isStart)
+        {
+            if (isStart) start = val;
+            else end = val;
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)

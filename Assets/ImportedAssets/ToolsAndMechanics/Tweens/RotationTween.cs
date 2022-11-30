@@ -16,6 +16,12 @@ namespace ToolsAndMechanics.Tweens
         [SerializeField]
         private Vector3 endRotation;
 
+        public void SetValue(Vector3 val, bool isStart)
+        {
+            if (isStart) startRotation = val;
+            else endRotation = val;
+        }
+
         public override void Execute(bool straight = true)
         {
             if (currTween != null)
