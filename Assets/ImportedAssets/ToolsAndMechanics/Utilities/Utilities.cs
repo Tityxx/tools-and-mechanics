@@ -1,12 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using Random = System.Random;
 
 namespace ToolsAndMechanics.Utilities
 {
+    public interface IFindable
+    {
+        public Vector3 Position { get; set; }
+    }
+
     public static class Utilities
     {
         public static void Shuffle<T>(this IList<T> list)
@@ -52,9 +57,6 @@ namespace ToolsAndMechanics.Utilities
             {
                 for (int x = 0; x < sqrtCellsCount; x++)
                 {
-                    /*Vector2 offset = new Vector2(x - (cellsCount) / 2, y - (float)cellsCount / 2) * size;
-                    array[y, x].position = center + new Vector3(offset.x, array[y, x].position.y, offset.y);*/
-
                     Vector2 offset = new Vector2(x, y) * size;
                     array[y, x].position = new Vector3(array[0, 0].position.x + offset.x, array[y, x].position.y, array[0, 0].position.z + offset.y);
                 }
@@ -86,7 +88,14 @@ namespace ToolsAndMechanics.Utilities
             return sqrDistance <= distance * distance;
         }
 
-        public static bool IsPointInQuad(Vector3 TL, Vector3 TR, Vector3 BL, Vector3 BR, Vector3 pos)
+        public static bool IsPointAtQuad(Vector3 BL, Vector3 TR, Vector3 pos)
+        {
+            Vector3 TL = new Vector3(BL.x, 0f, TR.z);
+            Vector3 BR = new Vector3(TR.x, 0f, BL.z);
+            return IsPointAtQuad(TL, TR, BL, BR, pos);
+        }
+
+        public static bool IsPointAtQuad(Vector3 TL, Vector3 TR, Vector3 BL, Vector3 BR, Vector3 pos)
         {
             return (pos.x > TL.x && pos.z < TL.z) &&
                 (pos.x < TR.x && pos.z < TR.z) &&
@@ -123,6 +132,77 @@ namespace ToolsAndMechanics.Utilities
 
             // Check if point is in triangle
             return (u >= 0) && (v >= 0) && (u + v < 1);
+        }
+
+        public static Vector2 GetRandomPositionAtQuad(Vector2 size)
+        {
+            return new Vector2(UnityEngine.Random.Range(-size.x / 2, size.x / 2), UnityEngine.Random.Range(-size.y / 2, size.y / 2));
+        }
+
+        public static Vector3 GetRandomPositionAtCircle(Vector3 center, float minRadius, float maxRadius)
+        {
+            Vector2 randCircle = UnityEngine.Random.insideUnitCircle;
+            Vector3 pos = center + (new Vector3(randCircle.x, 0f, randCircle.y) * UnityEngine.Random.Range(minRadius, maxRadius));
+            return pos;
+        }
+
+        public static IFindable GetNearest(this IFindable main, List<IFindable> list, bool includeSelf)
+        {
+            IFindable nearest = null;
+            float minDistance = float.MaxValue;
+
+            foreach (var obj in list)
+            {
+                if (!includeSelf && obj == main) continue;
+
+                float distance = GetDistance2D(main.Position, obj.Position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearest = obj;
+                }
+            }
+            return nearest;
+        }
+
+        public static IFindable GetNearestAtRange(this IFindable main, List<IFindable> list, bool includeSelf, float min, float max)
+        {
+            IFindable nearest = null;
+            float minDistance = max;
+
+            foreach (var obj in list)
+            {
+                if (!includeSelf && obj == main) continue;
+
+                float distance = GetDistance2D(main.Position, obj.Position);
+                if (distance < minDistance && distance >= min)
+                {
+                    minDistance = distance;
+                    nearest = obj;
+                }
+            }
+            return nearest;
+        }
+
+        public static IEnumerable<IFindable> GetObjectsAtRange(this IFindable main, List<IFindable> list, bool includeSelf, float min, float max)
+        {
+            if (includeSelf)
+            {
+                return list.Where(c => !IsDistanceLess2D(main.Position, c.Position, min) &&
+                        IsDistanceLess2D(main.Position, c.Position, max));
+            }
+            else
+            {
+
+                return list.Where(c => c != main && !IsDistanceLess2D(main.Position, c.Position, min) &&
+                        IsDistanceLess2D(main.Position, c.Position, max));
+            }
+        }
+
+        public static IEnumerable<IFindable> GetObjectsAtRange(this Vector3 pos, List<IFindable> list, float min, float max)
+        {
+            return list.Where(c => !IsDistanceLess2D(pos, c.Position, min) &&
+                           IsDistanceLess2D(pos, c.Position, max));
         }
     }
 }
