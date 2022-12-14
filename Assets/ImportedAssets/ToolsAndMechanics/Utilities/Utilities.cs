@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = System.Random;
 
@@ -141,8 +142,9 @@ namespace ToolsAndMechanics.Utilities
 
         public static Vector3 GetRandomPositionAtCircle(Vector3 center, float minRadius, float maxRadius)
         {
-            Vector2 randCircle = UnityEngine.Random.insideUnitCircle;
-            Vector3 pos = center + (new Vector3(randCircle.x, 0f, randCircle.y) * UnityEngine.Random.Range(minRadius, maxRadius));
+            Vector3 randCircle = UnityEngine.Random.onUnitSphere;
+            randCircle.y = 0;
+            Vector3 pos = center + randCircle * UnityEngine.Random.Range(minRadius, maxRadius);
             return pos;
         }
 
@@ -203,6 +205,37 @@ namespace ToolsAndMechanics.Utilities
         {
             return list.Where(c => !IsDistanceLess2D(pos, c.Position, min) &&
                            IsDistanceLess2D(pos, c.Position, max));
+        }
+
+        public static List<string> ParseEquation(string equation)
+        {
+            List<string> res = new List<string>();
+            foreach (var match in Regex.Matches(equation, @"([*+/\-)(=])|([0-9]+)|(\{[0-9]+})"))
+            {
+                res.Add(match.ToString());
+            }
+            return res;
+        }
+
+        public static bool IsSuccessEquation(string equation, List<string> prms)
+        {
+            List<string> equationList = ParseEquation(equation);
+            string answer = equationList[equationList.Count - 1];
+            //Remove '=' and answer
+            equationList.RemoveAt(equationList.Count - 1);
+            equationList.RemoveAt(equationList.Count - 1);
+
+            string eq = string.Format(string.Join("", equationList), prms.ToArray());
+            return new System.Data.DataTable().Compute(eq, "").ToString() == answer;
+        }
+
+        public static bool TryDoEquation(string equation, out float result)
+        {
+            if (float.TryParse(new System.Data.DataTable().Compute(equation, "").ToString(), out result))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
